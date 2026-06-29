@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import loveYouGif from "./love-you.gif";
 import catGif from "./cat-gif.gif";
 
@@ -198,7 +198,7 @@ export default function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(true);
 
-  const navLinks = ["home", "about", "experience", "leadership", "projects", "skills", "contact"];
+  const navLinks = useMemo(() => ["home", "about", "experience", "leadership", "projects", "skills", "contact"], []);
 
   // ── Theme tokens ──────────────────────────────────────────────
   const t = dark
