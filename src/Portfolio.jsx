@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import loveYouGif from "./love-you.gif";
 import catGif from "./cat-gif.gif";
+import barbieAudio from "./Barbie.mp3";
 
 const ROLES = ["Frontend Developer", "UX/UI Designer", "Full-Stack Builder", "People Person", "CS Graduate"];
 
@@ -197,6 +198,42 @@ export default function Portfolio() {
   const [activeNav, setActiveNav] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [dark, setDark] = useState(true);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const handleInteraction = () => {
+      if (audioRef.current && audioRef.current.paused && !musicPlaying) {
+        audioRef.current.play().then(() => {
+          setMusicPlaying(true);
+        }).catch(() => {});
+      }
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("scroll", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+    };
+
+    window.addEventListener("click", handleInteraction);
+    window.addEventListener("scroll", handleInteraction);
+    window.addEventListener("keydown", handleInteraction);
+
+    return () => {
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("scroll", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
+    };
+  }, [musicPlaying]);
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (musicPlaying) {
+        audioRef.current.pause();
+        setMusicPlaying(false);
+      } else {
+        audioRef.current.play().then(() => setMusicPlaying(true)).catch(() => {});
+      }
+    }
+  };
 
   const navLinks = useMemo(() => ["home", "about", "experience", "leadership", "projects", "skills", "contact"], []);
 
@@ -752,6 +789,7 @@ export default function Portfolio() {
       `}</style>
 
       <div style={s.root}>
+        <audio ref={audioRef} src={barbieAudio} loop />
         {/* NAV */}
         <nav style={s.nav}>
           <ul style={s.navLinksUl} className="nav-desktop">
@@ -768,6 +806,24 @@ export default function Portfolio() {
             ))}
           </ul>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <button
+              className="theme-btn"
+              style={s.themeBtn}
+              onClick={toggleMusic}
+              title="Toggle music"
+            >
+              {musicPlaying ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                  Music
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                  Music
+                </>
+              )}
+            </button>
             <button
               className="theme-btn"
               style={s.themeBtn}
