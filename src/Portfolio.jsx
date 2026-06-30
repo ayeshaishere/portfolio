@@ -201,9 +201,17 @@ export default function Portfolio() {
   const [musicPlaying, setMusicPlaying] = useState(false);
   const audioRef = useRef(null);
 
+  const autoPlayFired = useRef(false);
+
   useEffect(() => {
-    const handleInteraction = () => {
-      if (audioRef.current && audioRef.current.paused && !musicPlaying) {
+    if (autoPlayFired.current) return;
+
+    const handleInteraction = (e) => {
+      // Don't auto-play if the user clicked the music toggle button
+      if (e.target && e.target.closest && e.target.closest('[data-music-btn]')) return;
+      if (autoPlayFired.current) return;
+      autoPlayFired.current = true;
+      if (audioRef.current && audioRef.current.paused) {
         audioRef.current.play().then(() => {
           setMusicPlaying(true);
         }).catch(() => {});
@@ -222,7 +230,7 @@ export default function Portfolio() {
       window.removeEventListener("scroll", handleInteraction);
       window.removeEventListener("keydown", handleInteraction);
     };
-  }, [musicPlaying]);
+  }, []);
 
   const toggleMusic = () => {
     if (audioRef.current) {
@@ -395,7 +403,7 @@ export default function Portfolio() {
       minHeight: "100vh",
       display: "flex",
       alignItems: "center",
-      padding: "0 clamp(1.5rem, 8vw, 8rem)",
+      padding: "5rem clamp(1rem, 6vw, 8rem) 3rem",
       overflow: "hidden",
     },
     heroGlow: {
@@ -506,7 +514,7 @@ export default function Portfolio() {
       transition: "all 0.2s",
     },
     section: {
-      padding: "6rem clamp(1.5rem, 8vw, 8rem)",
+      padding: "4rem clamp(1rem, 6vw, 8rem)",
     },
     sectionLabel: {
       fontSize: "0.72rem",
@@ -534,8 +542,8 @@ export default function Portfolio() {
     },
     aboutGrid: {
       display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "4rem",
+      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+      gap: "2.5rem",
       alignItems: "center",
     },
     aboutText: {
@@ -776,10 +784,19 @@ export default function Portfolio() {
         
         @media (max-width: 768px) {
           .about-grid { grid-template-columns: 1fr !important; }
-          .split-card { grid-template-columns: 1fr; gap: 1rem; padding: 1.5rem; }
-          .slide-item { grid-template-columns: 1fr; gap: 1.5rem; padding: 2rem; align-items: start; }
+          .split-card { grid-template-columns: 1fr !important; gap: 1rem !important; padding: 1.25rem !important; }
+          .slide-item { grid-template-columns: 1fr !important; gap: 1rem !important; padding: 1.25rem !important; align-items: start !important; }
           .nav-desktop { display: none !important; }
           .hamburger { display: flex !important; }
+          .slideshow-container { height: auto !important; max-height: 380px; }
+          .mobile-theme-btns { gap: 0.4rem !important; }
+          .mobile-theme-btns button { padding: 0.3rem 0.55rem !important; font-size: 0.72rem !important; }
+          .mobile-theme-btns button span { display: none; }
+        }
+        @media (max-width: 480px) {
+          .split-card { padding: 1rem !important; }
+          .slide-item { padding: 1rem !important; }
+          .slideshow-container { max-height: 340px; }
         }
         .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
         .hamburger span { display: block; width: 22px; height: 2px; background: ${t.accentStrong}; border-radius: 2px; transition: background 0.35s; }
@@ -805,12 +822,13 @@ export default function Portfolio() {
               </li>
             ))}
           </ul>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div className="mobile-theme-btns" style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             <button
               className="theme-btn"
               style={s.themeBtn}
               onClick={toggleMusic}
               title="Toggle music"
+              data-music-btn="true"
             >
               {musicPlaying ? (
                 <>
@@ -926,7 +944,7 @@ export default function Portfolio() {
         <section id="experience" style={s.section}>
           <div style={s.sectionLabel}>Work Experience</div>
           <div style={s.divider} />
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem", gap: "0.5rem" }}>
             <h2 style={{ ...s.sectionTitle, marginBottom: 0 }}>Where I've Worked</h2>
             <div style={{ fontSize: "0.85rem", color: t.accentStrong, fontWeight: 600, display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <span className="blink-text">Scroll inside</span>
@@ -1082,7 +1100,7 @@ export default function Portfolio() {
               <div style={s.sectionLabel}>Skills</div>
               <div style={s.divider} />
               
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem", gap: "0.5rem" }}>
                 <h2 style={{ ...s.sectionTitle, marginBottom: 0 }}>My Toolkit</h2>
                 <div style={{ fontSize: "0.85rem", color: t.accentStrong, fontWeight: 600, display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <span className="blink-text">Scroll inside</span>
@@ -1116,7 +1134,7 @@ export default function Portfolio() {
           <div style={s.contactGrid}>
             <div style={s.contactInfo}>
               <p style={{ fontSize: "1rem", color: t.textMuted, lineHeight: 1.85 }}>
-                I'm actively looking for full-time roles in frontend development or product design. Got an interesting project or opportunity? I'd love to hear from you.
+                I'm actively looking for full-time roles in website development, product design and HR. Got an interesting project or opportunity? I'd love to hear from you.
               </p>
 
               {/* Social Icons */}
